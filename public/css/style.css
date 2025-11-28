@@ -1,0 +1,115 @@
+:root {
+    --bg-dark: #1b2838;
+    --bg-panel: #16202d;
+    --blue: #66c0f4;
+    --green: #59bf40;
+    --text-light: #c7d5e0;
+    --text-white: #ffffff;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Tahoma, sans-serif;
+}
+
+body {
+    background: var(--bg-dark);
+    color: var(--text-light);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    background: var(--bg-panel);
+    padding: 30px;
+    border-radius: 12px;
+    width: 350px;
+    text-align: center;
+    box-shadow: 0 0 25px rgba(0,0,0,0.5);
+}
+
+h1 {
+    margin-bottom: 20px;
+    color: var(--text-white);
+    font-weight: 600;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0 16px;
+    border: none;
+    border-radius: 6px;
+    background: #0e141b;
+    color: var(--text-light);
+}
+
+button {
+    width: 100%;
+    background: var(--green);
+    border: none;
+    padding: 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    color: var(--text-white);
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+button:hover {
+    background: #4aa535;
+}
+
+a {
+    color: var(--blue);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+#profile-info {
+    margin: 20px 0;
+    background: #0f1923;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.navbar {
+    width: 100%;
+    background: #171a21;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+.nav-brand {
+    color: var(--blue);
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+}
+
+.nav-links a {
+    color: var(--text-light);
+    text-decoration: none;
+    font-size: 16px;
+}
+
+.nav-links a:hover {
+    color: var(--blue);
+}

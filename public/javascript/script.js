@@ -1,7 +1,7 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const constantes_1 = require("./constantes");
+import { backendAddress } from "./constantes";
 function exibeListaGames() {
-    fetch(constantes_1.backendAddress);
+    fetch(backendAddress + "games/lista")
+        .then(response => response.json())
+        .then;
 }
 //# sourceMappingURL=script.js.map

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <title>Meu Perfil - GamerBoxd</title>
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+
+    <div id="navbar"></div>
+
+    <div class="container">
+        <h1>Meu Perfil</h1>
+
+        <div id="profile-info">
+            Carregando dados...
+        </div>
+
+        <button id="logout-btn">Sair</button>
+    </div>
+
+    <script type="module" src="./javascript/profile.js"></script>
+
+    <script>
+        fetch("./components/navbar.html")
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById("navbar").innerHTML = html;
+            });
+    </script>
+
+    <script type="module" src="./javascript/logout.js"></script>
+
+</body>
+</html>
