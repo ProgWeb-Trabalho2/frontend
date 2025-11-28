@@ -41,7 +41,7 @@ function gameList(games) {
         card.appendChild(name);
         const releaseDate = document.createElement("p");
         releaseDate.textContent =
-            (_c = (_b = game.releaseYear) === null || _b === void 0 ? void 0 : _b.toString()) !== null && _c !== void 0 ? _c : "Ano desconhecido";
+            (_c = (_b = game.releaseDate) === null || _b === void 0 ? void 0 : _b.toString()) !== null && _c !== void 0 ? _c : "Ano desconhecido";
         card.appendChild(releaseDate);
         const genres = document.createElement("p");
         genres.textContent = game.genres.join(", ");

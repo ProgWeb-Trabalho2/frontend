@@ -57,7 +57,7 @@ function gameList(games: Game[]) {
 
     const releaseDate = document.createElement("p");
     releaseDate.textContent =
-      game.releaseYear?.toString() ?? "Ano desconhecido";
+      game.releaseDate?.toString() ?? "Ano desconhecido";
     card.appendChild(releaseDate);
 
     const genres = document.createElement("p");

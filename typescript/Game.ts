@@ -4,7 +4,7 @@ export class Game {
   summary: string;
   genres: string[];
   coverUrl: string | null;
-  releaseYear: string | null;
+  releaseDate: string | null;
 
   constructor(raw: any) {
     this.id = raw.id;
@@ -17,11 +17,9 @@ export class Game {
 
     if (raw.release_dates && raw.release_dates.length > 0) {
       const unix = raw.release_dates[0].date;
-      this.releaseYear = new Date(unix * 1000).toLocaleDateString("pt-BR");
+      this.releaseDate = new Date(unix * 1000).toLocaleDateString("pt-BR");
     } else {
-      this.releaseYear = null;
+      this.releaseDate = null;
     }
-
-    raw.name;
   }
 }

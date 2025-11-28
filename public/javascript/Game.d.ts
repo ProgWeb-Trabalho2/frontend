@@ -4,7 +4,7 @@ export declare class Game {
     summary: string;
     genres: string[];
     coverUrl: string | null;
-    releaseYear: string | null;
+    releaseDate: string | null;
     constructor(raw: any);
 }
 //# sourceMappingURL=Game.d.ts.map
