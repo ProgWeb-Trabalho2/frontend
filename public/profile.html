@@ -6,30 +6,38 @@
     <link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
-
     <div id="navbar"></div>
 
-    <div class="container">
-        <h1>Meu Perfil</h1>
+    <main class="profile-container">
+        <section class="profile-header">
+            <img id="avatar" class="profile-avatar" alt="Avatar" />
+            
+            <div class="profile-details">
+                <h1 id="username"></h1>
+                <p id="email"></p>
+                <p id="bio"></p>
 
-        <div id="profile-info">
-            Carregando dados...
-        </div>
+                <a href="edit-profile.html" class="btn-primary">
+                    Editar Perfil
+                </a>
+            </div>
+        </section>
 
-        <button id="logout-btn">Sair</button>
-    </div>
+        <section class="profile-reviews">
+            <h2>Reviews Recentes</h2>
+            <p class="placeholder-text">
+                Nenhuma review encontrada.<br>
+                <small>(TBD)</small>
+            </p>
+        </section>
+    </main>
 
     <script type="module" src="./javascript/profile.js"></script>
 
     <script>
         fetch("./components/navbar.html")
-            .then(res => res.text())
-            .then(html => {
-                document.getElementById("navbar").innerHTML = html;
-            });
+            .then(r => r.text())
+            .then(h => document.getElementById("navbar").innerHTML = h);
     </script>
-
-    <script type="module" src="./javascript/logout.js"></script>
-
 </body>
 </html>

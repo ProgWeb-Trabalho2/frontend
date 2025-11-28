@@ -11,15 +11,17 @@ import { api } from "./api.js";
 function loadProfile() {
     return __awaiter(this, void 0, void 0, function* () {
         const result = yield api("/auth/me/");
-        if (result.username) {
-            document.getElementById("profile-info").innerHTML = `
-            <p><strong>Usuário:</strong> ${result.username}</p>
-            <p><strong>Email:</strong> ${result.email}</p>
-        `;
+        if (!result.username) {
+            return window.location.href = "login.html";
         }
-        else {
-            window.location.href = "login.html";
-        }
+        document.getElementById("avatar").src =
+            result.avatar || "./images/default-avatar.png";
+        document.getElementById("username").innerText =
+            result.username;
+        document.getElementById("email").innerText =
+            `Email: ${result.email}`;
+        document.getElementById("bio").innerText =
+            result.bio || "Sem biografia.";
     });
 }
 loadProfile();
