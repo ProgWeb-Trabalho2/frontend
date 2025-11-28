@@ -1,19 +1,15 @@
 import { backendAddress } from "./constantes.js";
 
-(document.getElementById("btnCadastro") as HTMLButtonElement).addEventListener(
+(document.getElementById("btnLogin") as HTMLButtonElement).addEventListener(
   "click",
   (evento) => {
     evento.preventDefault();
-    console.log("apertou o botao");
     const username = (document.getElementById("username") as HTMLInputElement)
       .value;
     const password = (document.getElementById("password") as HTMLInputElement)
       .value;
-    const password_confirm = (
-      document.getElementById("password-confirm") as HTMLInputElement
-    ).value;
 
-    fetch(backendAddress + "accounts/register/", {
+    fetch(backendAddress + "accounts/login/", {
       method: "POST",
       body: JSON.stringify({
         username: username,
@@ -32,9 +28,10 @@ import { backendAddress } from "./constantes.js";
         const token = data.token;
         const username = data.username;
 
+        console.log(data);
         localStorage.setItem("token", token);
         localStorage.setItem("username", username);
-        window.location.href = "/";
+        // window.location.href = "/";
       })
       .catch((erro) => {
         console.log(erro);

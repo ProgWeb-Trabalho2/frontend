@@ -1,13 +1,11 @@
 import { backendAddress } from "./constantes.js";
-document.getElementById("btnCadastro").addEventListener("click", (evento) => {
+document.getElementById("btnLogin").addEventListener("click", (evento) => {
     evento.preventDefault();
-    console.log("apertou o botao");
     const username = document.getElementById("username")
         .value;
     const password = document.getElementById("password")
         .value;
-    const password_confirm = document.getElementById("password-confirm").value;
-    fetch(backendAddress + "accounts/register/", {
+    fetch(backendAddress + "accounts/login/", {
         method: "POST",
         body: JSON.stringify({
             username: username,
@@ -25,12 +23,13 @@ document.getElementById("btnCadastro").addEventListener("click", (evento) => {
         .then((data) => {
         const token = data.token;
         const username = data.username;
+        console.log(data);
         localStorage.setItem("token", token);
         localStorage.setItem("username", username);
-        window.location.href = "/";
+        // window.location.href = "/";
     })
         .catch((erro) => {
         console.log(erro);
     });
 });
-//# sourceMappingURL=cadastro.js.map
+//# sourceMappingURL=login.js.map
