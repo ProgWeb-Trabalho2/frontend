@@ -1,19 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jogos</title>
     <link rel="stylesheet" href="./css/style.css">
 </head>
+
 <body>
     <div id="navbar"></div>
 
-    <div class="search-container">
-        <input type="text" id="search-bar" placeholder="Busque um jogo...">
-    </div>
+    <div style="display: flex; flex-direction: column; align-items: center;">
+        <div class="search-container">
+            <input type="text" id="search-bar" placeholder="Busque um jogo...">
+        </div>
 
-    <div id="game-list" class="game-list"></div>
+        <div id="game-list" class="game-list"></div>
+    </div>
 
     <script>
         fetch("./components/navbar.html")
@@ -24,4 +28,5 @@
     <script type="module" src="javascript/game-search.js"></script>
     <script type="module" src="javascript/constantes.js"></script>
 </body>
+
 </html>

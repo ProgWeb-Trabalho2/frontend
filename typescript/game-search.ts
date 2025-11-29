@@ -1,60 +1,69 @@
 import { backendAddress } from "./constantes.js";
+import { Game } from "./Game.js";
 
-const searchInput = document.getElementById("search-bar") as HTMLInputElement;
-const gameList = document.getElementById("game-list") as HTMLDivElement;
+onload = () => {
+  const search = document.getElementById(
+    "search-bar"
+  ) as HTMLInputElement | null;
 
-function createCard(game: any) {
-    const div = document.createElement("div");
-    div.className = "game-card";
+  if (!search) return;
 
-    const coverUrl =
-        game.cover?.url?.replace("t_thumb", "t_cover_big") ||
-        "./images/game-placeholder.jpg";
+  search.addEventListener("keydown", async (e) => {
+    if (e.key === "Enter") {
+      const data = await searchGame(search.value);
+      gameList(data);
+    }
+  });
+};
 
-    div.innerHTML = `
-        <img src="${coverUrl}" alt="${game.name}">
-        <h3>${game.name}</h3>
-        <p>${game.genres?.map((g: any) => g.name).join(", ") || "Sem gênero"}</p>
-    `;
+async function searchGame(game: string) {
+  const response = await fetch(backendAddress + "api/games/search/" + game);
 
-    div.addEventListener("click", () => {
-        window.location.href = `jogo.html?id=${game.id}`;
-    });
+  if (!response.ok) return [];
 
-    return div;
+  const data = await response.json();
+  return data.map((game: any) => new Game(game));
 }
 
-async function searchGame(searchTerm: string) {
-    if (!searchTerm.trim()) {
-        gameList.innerHTML = "";
-        return;
-    }
+function gameList(games: Game[]) {
+  const container = document.getElementById("game-list");
 
-    const url = `${backendAddress}api/games/search/${encodeURIComponent(searchTerm)}/`;
+  if (!container) return;
 
-    try {
-        const response = await fetch(url);
-        if (!response.ok) throw new Error("Erro ao buscar jogos");
+  container.innerHTML = "";
 
-        const games = await response.json();
+  if (games.length == 0) {
+    container.textContent = "Nenhum jogo encontrado";
+    return;
+  }
 
-        gameList.innerHTML = "";
+  games.forEach((game) => {
+    const card = document.createElement("div");
+    card.classList.add("game-card");
 
-        if (!games.length) {
-            gameList.innerHTML = "<p>Nenhum jogo encontrado</p>";
-            return;
-        }
+    const image = document.createElement("img");
+    console.log(game.coverUrl);
+    image.setAttribute("src", game.coverUrl ?? "");
+    image.setAttribute("alt", game.name);
+    card.appendChild(image);
 
-        games.forEach((game: any) => {
-            const card = createCard(game);
-            gameList.appendChild(card);
-        });
+    const name = document.createElement("h2");
+    name.textContent = game.name;
+    card.appendChild(name);
 
-    } catch (err) {
-        console.error("Erro na busca de jogos:", err);
-    }
+    const releaseDate = document.createElement("p");
+    releaseDate.textContent =
+      game.releaseDate?.toString() ?? "Ano desconhecido";
+    card.appendChild(releaseDate);
+
+    const genres = document.createElement("p");
+    genres.textContent = game.genres.join(", ");
+    card.appendChild(genres);
+
+    const summary = document.createElement("p");
+    summary.textContent = game.summary;
+    card.appendChild(summary);
+
+    container.appendChild(card);
+  });
 }
-
-searchInput.addEventListener("input", () => {
-    searchGame(searchInput.value);
-});

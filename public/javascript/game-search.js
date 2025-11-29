@@ -8,52 +8,59 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { backendAddress } from "./constantes.js";
-const searchInput = document.getElementById("search-bar");
-const gameList = document.getElementById("game-list");
-function createCard(game) {
-    var _a, _b, _c;
-    const div = document.createElement("div");
-    div.className = "game-card";
-    const coverUrl = ((_b = (_a = game.cover) === null || _a === void 0 ? void 0 : _a.url) === null || _b === void 0 ? void 0 : _b.replace("t_thumb", "t_cover_big")) ||
-        "./images/game-placeholder.jpg";
-    div.innerHTML = `
-        <img src="${coverUrl}" alt="${game.name}">
-        <h3>${game.name}</h3>
-        <p>${((_c = game.genres) === null || _c === void 0 ? void 0 : _c.map((g) => g.name).join(", ")) || "Sem gênero"}</p>
-    `;
-    div.addEventListener("click", () => {
-        window.location.href = `jogo.html?id=${game.id}`;
-    });
-    return div;
-}
-function searchGame(searchTerm) {
+import { Game } from "./Game.js";
+onload = () => {
+    const search = document.getElementById("search-bar");
+    if (!search)
+        return;
+    search.addEventListener("keydown", (e) => __awaiter(void 0, void 0, void 0, function* () {
+        if (e.key === "Enter") {
+            const data = yield searchGame(search.value);
+            gameList(data);
+        }
+    }));
+};
+function searchGame(game) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (!searchTerm.trim()) {
-            gameList.innerHTML = "";
-            return;
-        }
-        const url = `${backendAddress}api/games/search/${encodeURIComponent(searchTerm)}/`;
-        try {
-            const response = yield fetch(url);
-            if (!response.ok)
-                throw new Error("Erro ao buscar jogos");
-            const games = yield response.json();
-            gameList.innerHTML = "";
-            if (!games.length) {
-                gameList.innerHTML = "<p>Nenhum jogo encontrado</p>";
-                return;
-            }
-            games.forEach((game) => {
-                const card = createCard(game);
-                gameList.appendChild(card);
-            });
-        }
-        catch (err) {
-            console.error("Erro na busca de jogos:", err);
-        }
+        const response = yield fetch(backendAddress + "api/games/search/" + game);
+        if (!response.ok)
+            return [];
+        const data = yield response.json();
+        return data.map((game) => new Game(game));
     });
 }
-searchInput.addEventListener("input", () => {
-    searchGame(searchInput.value);
-});
+function gameList(games) {
+    const container = document.getElementById("game-list");
+    if (!container)
+        return;
+    container.innerHTML = "";
+    if (games.length == 0) {
+        container.textContent = "Nenhum jogo encontrado";
+        return;
+    }
+    games.forEach((game) => {
+        var _a, _b, _c;
+        const card = document.createElement("div");
+        card.classList.add("game-card");
+        const image = document.createElement("img");
+        console.log(game.coverUrl);
+        image.setAttribute("src", (_a = game.coverUrl) !== null && _a !== void 0 ? _a : "");
+        image.setAttribute("alt", game.name);
+        card.appendChild(image);
+        const name = document.createElement("h2");
+        name.textContent = game.name;
+        card.appendChild(name);
+        const releaseDate = document.createElement("p");
+        releaseDate.textContent =
+            (_c = (_b = game.releaseDate) === null || _b === void 0 ? void 0 : _b.toString()) !== null && _c !== void 0 ? _c : "Ano desconhecido";
+        card.appendChild(releaseDate);
+        const genres = document.createElement("p");
+        genres.textContent = game.genres.join(", ");
+        card.appendChild(genres);
+        const summary = document.createElement("p");
+        summary.textContent = game.summary;
+        card.appendChild(summary);
+        container.appendChild(card);
+    });
+}
 //# sourceMappingURL=game-search.js.map
