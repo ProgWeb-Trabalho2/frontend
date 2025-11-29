@@ -7,37 +7,42 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { api } from "./api.js";
+import { backendAddress } from "./constantes.js";
+import { Game } from "./Game.js";
 function getGameIdFromURL() {
     const params = new URLSearchParams(window.location.search);
     return Number(params.get("id"));
 }
 function loadGame() {
     return __awaiter(this, void 0, void 0, function* () {
-        var _a, _b, _c;
+        var _a;
         const id = getGameIdFromURL();
-        const game = yield api(`games/search-by-id/${id}/`);
+        const response = yield fetch(`${backendAddress}/api/games/search-by-id/${id}/`);
+        const games = yield response.json();
+        const game = new Game(games[0]);
         document.getElementById("cover").src =
-            ((_a = game.cover) === null || _a === void 0 ? void 0 : _a.url) || "./images/game-placeholder.jpg";
+            game.coverUrl || "./images/game-placeholder.jpg";
         document.getElementById("name").innerText = game.name;
         document.getElementById("releaseDate").innerText =
-            game.first_release_date ? `Lançamento: ${game.first_release_date}` : "";
+            game.releaseDate ? `Lançamento: ${game.releaseDate}` : "";
         document.getElementById("genres").innerText =
-            ((_b = game.genres) === null || _b === void 0 ? void 0 : _b.map((g) => g.name).join(", ")) || "";
+            game.genres.join(", ");
         document.getElementById("summary").innerText =
             game.summary || "Sem descrição deste jogo disponível.";
-        (_c = document.getElementById("create-review-btn")) === null || _c === void 0 ? void 0 : _c.addEventListener("click", () => {
-            window.location.href = `review-create.html?game=${id}`;
+        (_a = document
+            .getElementById("create-review-btn")) === null || _a === void 0 ? void 0 : _a.addEventListener("click", () => {
+            window.location.href = `create-review.html?game=${id}`;
         });
         yield loadGameReviews(id);
     });
 }
 function loadGameReviews(gameId) {
     return __awaiter(this, void 0, void 0, function* () {
-        const reviews = yield api(`reviews/game/${gameId}/`);
+        const response = yield fetch(`${backendAddress}api/reviews/game/${gameId}/`);
+        const reviews = yield response.json();
         const container = document.getElementById("game-reviews");
         container.innerHTML = "<h2>Reviews</h2>";
-        if (!reviews.length) {
+        if (!reviews) {
             container.innerHTML += "<p>Este jogo ainda não possui reviews.</p>";
             return;
         }

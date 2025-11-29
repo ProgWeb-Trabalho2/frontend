@@ -17,10 +17,9 @@
 body {
     background: var(--bg-dark);
     color: var(--text-light);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+    min-height: 100vh;
+    padding-top: 60px;
+    margin: 0;
 }
 
 .container {
@@ -382,7 +381,7 @@ body.page-dark {
     text-decoration: none;
 }
 
-.navbar {
+#navbar {
     position: fixed;
     top: 0;
     width: 100%;
@@ -471,12 +470,13 @@ body.page-dark {
 }
 
 .game-page-container {
-    margin-top: 100px;
     padding: 25px;
+    max-width: 75%;
 }
 
 .game-header {
     display: flex;
+    flex-direction: row;
     gap: 30px;
     background: #2a475e;
     padding: 20px;

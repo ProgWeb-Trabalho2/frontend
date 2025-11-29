@@ -1,24 +1,28 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jogo</title>
     <link rel="stylesheet" href="./css/style.css">
 </head>
-<body class="page-dark">
+
+<body style="display: flex; justify-content: center;">
 
     <div id="navbar"></div>
 
     <div class="game-page-container">
         <div class="game-header">
-            <img id="cover" class="game-cover-large" alt="Capa do jogo">
+            <div>
+                <img id="cover" class="game-cover-large" alt="Capa do jogo">
+            </div>
 
             <div class="game-info">
                 <h1 id="name"></h1>
                 <p id="releaseDate"></p>
                 <p id="genres"></p>
-                <p id="summary"></p>
+                <p id="summary" style="margin-bottom: 10px;"></p>
 
                 <button id="create-review-btn" class="btn-primary">
                     Avaliar este jogo
@@ -38,4 +42,5 @@
             .then(html => document.getElementById("navbar").innerHTML = html);
     </script>
 </body>
+
 </html>

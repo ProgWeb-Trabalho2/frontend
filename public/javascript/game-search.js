@@ -61,6 +61,10 @@ function gameList(games) {
         summary.textContent = game.summary;
         card.appendChild(summary);
         container.appendChild(card);
+        card.addEventListener("click", (e) => {
+            e.preventDefault();
+            window.location.href = `jogo.html?id=${game.id}`;
+        });
     });
 }
 //# sourceMappingURL=game-search.js.map

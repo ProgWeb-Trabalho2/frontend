@@ -65,5 +65,11 @@ function gameList(games: Game[]) {
     card.appendChild(summary);
 
     container.appendChild(card);
+
+    card.addEventListener("click", (e) => {
+      e.preventDefault();
+
+      window.location.href = `jogo.html?id=${game.id}`;
+    });
   });
 }
