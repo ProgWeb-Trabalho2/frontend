@@ -1,27 +1,42 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <script src="./javascript/api.js" type="module"></script>
-    <script src="./javascript/edit-review.js" type="module"></script>
-    <link rel="stylesheet" href="./styles.css">
+    <script src="./javascript/review-edit.js" type="module"></script>
+    <link rel="stylesheet" href="css/style.css" />
     <title>Editar Review</title>
 </head>
+
 <body class="page-dark">
-    <div class="profile-container">
+    <div id="navbar"></div>
+
+    <main class="container">
         <h1>Editar Review</h1>
+        <div class="profile-box">
+            <div>
+                <h3><strong>Jogo:</strong> <span id="game-name"></span></h3>
+            </div>
 
-        <p><strong>Jogo:</strong> <span id="game-name"></span></p>
+            <div>
+                <label for="score">Nota (0-10):</label>
+                <input type="number" id="score" min="0" max="10" style="width: 50px;" />
+            </div>
 
-        <label>Nota (0-10):</label>
-        <input type="number" id="score" min="0" max="10">
+            <div>
+                <textarea id="comment" rows="5" placeholder="Comentários"></textarea>
+            </div>
+            <button id="save-edit" class="btn-primary">Salvar</button>
 
-        <label>Comentário:</label>
-        <textarea id="comment" rows="5"></textarea>
-
-        <button id="save-edit" class="btn-primary">Salvar</button>
-
-        <p id="msg"></p>
-    </div>
+            <p id="msg"></p>
+        </div>
+    </main>
+    <script>
+        fetch("./components/navbar.html")
+            .then((r) => r.text())
+            .then((h) => (document.getElementById("navbar").innerHTML = h));
+    </script>
 </body>
+
 </html>
