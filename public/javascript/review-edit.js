@@ -7,35 +7,39 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-function loadEditForm() {
+import { api } from "./api.js";
+function loadReview() {
     return __awaiter(this, void 0, void 0, function* () {
-        const index = Number(localStorage.getItem("editReviewIndex"));
-        const list = JSON.parse(localStorage.getItem("reviews") || "[]");
-        const review = list[index];
-        const res = yield fetch("./data/games.json");
-        const games = yield res.json();
-        const select = document.getElementById("game-select");
-        games.forEach((g) => {
-            const opt = document.createElement("option");
-            opt.value = g.id.toString();
-            opt.textContent = g.name;
-            if (opt.value === review.game)
-                opt.selected = true;
-            select.appendChild(opt);
-        });
+        const reviewId = localStorage.getItem("editReviewId");
+        if (!reviewId)
+            return window.location.href = "profile.html";
+        const review = yield api(`/reviews/${reviewId}/`);
         document.getElementById("score").value = review.score;
         document.getElementById("comment").value = review.comment;
-        document.getElementById("update-btn").addEventListener("click", () => {
-            review.game = select.value;
-            review.score = document.getElementById("score").value;
-            review.comment = document.getElementById("comment").value;
-            list[index] = review;
-            localStorage.setItem("reviews", JSON.stringify(list));
-            localStorage.removeItem("editReviewIndex");
-            window.location.href = "profile.html";
-        });
+        const gameRes = yield fetch(`http://localhost:8000/api/games/search-by-id/${review.game_id}/`);
+        const data = yield gameRes.json();
+        const game = data[0];
+        document.getElementById("game-name").innerText = game.name;
     });
 }
-loadEditForm();
-export {};
+function saveReview() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const reviewId = localStorage.getItem("editReviewId");
+        if (!reviewId)
+            return;
+        const score = Number(document.getElementById("score").value);
+        const comment = document.getElementById("comment").value;
+        yield api(`/reviews/${reviewId}/`, {
+            method: "PATCH",
+            body: JSON.stringify({ score, comment })
+        });
+        document.getElementById("msg").innerText = "Alterações salvas com sucesso!";
+        setTimeout(() => {
+            window.location.href = "profile.html";
+        }, 1000);
+    });
+}
+document.getElementById("save-edit")
+    .addEventListener("click", saveReview);
+loadReview();
 //# sourceMappingURL=review-edit.js.map
