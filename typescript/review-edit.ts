@@ -1,34 +1,41 @@
-async function loadEditForm() {
-    const index = Number(localStorage.getItem("editReviewIndex"));
-    const list = JSON.parse(localStorage.getItem("reviews") || "[]");
-    const review = list[index];
+import { api } from "./api.js";
 
-    const res = await fetch("./data/games.json");
-    const games = await res.json();
+async function loadReview() {
+    const reviewId = localStorage.getItem("editReviewId");
+    if (!reviewId) return window.location.href = "profile.html";
 
-    const select = document.getElementById("game-select") as HTMLSelectElement;
-    games.forEach((g: any) => {
-        const opt = document.createElement("option");
-        opt.value = g.id.toString();
-        opt.textContent = g.name;
-        if (opt.value === review.game) opt.selected = true;
-        select.appendChild(opt);
-    });
+    const review = await api(`/reviews/${reviewId}/`);
 
     (document.getElementById("score") as HTMLInputElement).value = review.score;
     (document.getElementById("comment") as HTMLTextAreaElement).value = review.comment;
 
-    document.getElementById("update-btn")!.addEventListener("click", () => {
-        review.game = select.value;
-        review.score = (document.getElementById("score") as HTMLInputElement).value;
-        review.comment = (document.getElementById("comment") as HTMLTextAreaElement).value;
+    const gameRes = await fetch(`http://localhost:8000/api/games/search-by-id/${review.game_id}/`);
+    const data = await gameRes.json();
+    const game = data[0];
 
-        list[index] = review;
-        localStorage.setItem("reviews", JSON.stringify(list));
-
-        localStorage.removeItem("editReviewIndex");
-        window.location.href = "profile.html";
-    });
+    (document.getElementById("game-name") as HTMLElement).innerText = game.name;
 }
 
-loadEditForm();
+async function saveReview() {
+    const reviewId = localStorage.getItem("editReviewId");
+    if (!reviewId) return;
+
+    const score = Number((document.getElementById("score") as HTMLInputElement).value);
+    const comment = (document.getElementById("comment") as HTMLTextAreaElement).value;
+
+    await api(`/reviews/${reviewId}/`, {
+        method: "PATCH",
+        body: JSON.stringify({ score, comment })
+    });
+
+    (document.getElementById("msg") as HTMLElement).innerText = "Alterações salvas com sucesso!";
+
+    setTimeout(() => {
+        window.location.href = "profile.html";
+    }, 1000);
+}
+
+document.getElementById("save-edit")!
+    .addEventListener("click", saveReview);
+
+loadReview();
