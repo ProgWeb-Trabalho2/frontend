@@ -4,11 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jogos</title>
-    <script type="module" src="javascript/game-search.js"></script>
-    <script type="module" src="javascript/constantes.js"></script>
+    <link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
-    <input type="text" id="search-bar" placeholder="Digite o nome do jogo">
-    <div id="game-list"></div>
+    <div id="navbar"></div>
+
+    <div class="search-container">
+        <input type="text" id="search-bar" placeholder="Busque um jogo...">
+    </div>
+
+    <div id="game-list" class="game-list"></div>
+
+    <script>
+        fetch("./components/navbar.html")
+            .then(r => r.text())
+            .then(h => document.getElementById("navbar").innerHTML = h);
+    </script>
+
+    <script type="module" src="javascript/game-search.js"></script>
+    <script type="module" src="javascript/constantes.js"></script>
 </body>
 </html>

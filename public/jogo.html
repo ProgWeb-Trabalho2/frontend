@@ -1,16 +1,41 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="title"></title>
-    <script type="module" src="javascript/game-page.js"></script>
-    <script type="module" src="javascript/constantes.js"></script>
+    <title>Jogo</title>
+    <link rel="stylesheet" href="./css/style.css">
 </head>
-<body>
-    <h1 id="name"></h1>
-    <img id="cover">
-    <p id="releaseDate"></p>
-    <p id="summary"></p>
+<body class="page-dark">
+
+    <div id="navbar"></div>
+
+    <div class="game-page-container">
+        <div class="game-header">
+            <img id="cover" class="game-cover-large" alt="Capa do jogo">
+
+            <div class="game-info">
+                <h1 id="name"></h1>
+                <p id="releaseDate"></p>
+                <p id="genres"></p>
+                <p id="summary"></p>
+
+                <button id="create-review-btn" class="btn-primary">
+                    Avaliar este jogo
+                </button>
+            </div>
+        </div>
+
+        <div id="game-reviews" class="reviews-container"></div>
+    </div>
+
+    <script type="module" src="./javascript/game-page.js"></script>
+    <script type="module" src="./javascript/logout.js"></script>
+
+    <script>
+        fetch("./components/navbar.html")
+            .then(r => r.text())
+            .then(html => document.getElementById("navbar").innerHTML = html);
+    </script>
 </body>
 </html>

@@ -1,33 +1,53 @@
-import { backendAddress } from "./constantes.js";
-import { Game } from "./Game.js";
+import { api } from "./api.js";
 
-const params = new URLSearchParams(window.location.search);
-const gameID = params.get("id");
-
-onload = async () => {
-  console.log("carregou");
-  if (!gameID) return;
-
-  const game = await fetchGame(gameID);
-  if (!game) return;
-
-  console.log(game);
-  document.getElementById("title")!.textContent = game.name;
-  document.getElementById("name")!.textContent = game.name;
-
-  const image = document.getElementById("cover") as HTMLImageElement;
-  image.src = game.coverUrl ?? "";
-
-  document.getElementById("releaseDate")!.textContent = game.releaseDate;
-
-  document.getElementById("summary")!.textContent = game.summary;
-};
-
-async function fetchGame(id: string) {
-  const response = await fetch(backendAddress + "games/search-by-id/" + id);
-
-  if (!response.ok) return;
-
-  const data = await response.json();
-  return new Game(data[0]);
+function getGameIdFromURL(): number {
+    const params = new URLSearchParams(window.location.search);
+    return Number(params.get("id"));
 }
+
+async function loadGame() {
+    const id = getGameIdFromURL();
+    const game = await api(`games/search-by-id/${id}/`);
+
+    (document.getElementById("cover") as HTMLImageElement).src =
+        game.cover?.url || "./images/game-placeholder.jpg";
+    (document.getElementById("name") as HTMLElement).innerText = game.name;
+    (document.getElementById("releaseDate") as HTMLElement).innerText =
+        game.first_release_date ? `Lançamento: ${game.first_release_date}` : "";
+    (document.getElementById("genres") as HTMLElement).innerText =
+        game.genres?.map((g: any) => g.name).join(", ") || "";
+
+    (document.getElementById("summary") as HTMLElement).innerText =
+        game.summary || "Sem descrição deste jogo disponível.";
+
+    document.getElementById("create-review-btn")?.addEventListener("click", () => {
+        window.location.href = `review-create.html?game=${id}`;
+    });
+
+    await loadGameReviews(id);
+}
+
+async function loadGameReviews(gameId: number) {
+    const reviews = await api(`reviews/game/${gameId}/`);
+
+    const container = document.getElementById("game-reviews")!;
+    container.innerHTML = "<h2>Reviews</h2>";
+
+    if (!reviews.length) {
+        container.innerHTML += "<p>Este jogo ainda não possui reviews.</p>";
+        return;
+    }
+
+    reviews.forEach((review: any) => {
+        const div = document.createElement("div");
+        div.className = "review-card";
+        div.innerHTML = `
+            <p><strong>${review.user_username}</strong> avaliou:</p>
+            <p>⭐ ${review.score}/10</p>
+            <p>${review.comment}</p>
+        `;
+        container.appendChild(div);
+    });
+}
+
+loadGame();

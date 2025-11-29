@@ -360,3 +360,146 @@ a:hover {
 .icon:hover {
     background: var(--blue);
 }
+
+body.page-dark {
+    background: #1b2838;
+    color: #c7d5e0;
+    font-family: Arial, sans-serif;
+    margin: 0;
+}
+
+.steam-header {
+    background: #171a21;
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.steam-header .logo {
+    font-size: 22px;
+    color: #66c0f4;
+    text-decoration: none;
+}
+
+.navbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background: #171a21;
+    color: #c7d5e0;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    z-index: 999;
+}
+
+.page-dark {
+    background-color: #1b2838;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
+}
+
+.search-container {
+    margin-top: 80px; 
+    padding: 10px 25px;
+}
+
+#search-bar {
+    width: 250px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    border: none;
+    background: #2a475e;
+    color: #fff;
+    outline: none;
+}
+
+#search-bar::placeholder {
+    color: #9cb2c7;
+}
+
+
+.game-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+}
+
+.game-list {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
+    gap: 20px !important;
+    padding: 20px !important;
+    margin-top: 100px !important;
+}
+
+.game-card {
+    background: #1b2838;
+    border-radius: 6px;
+    padding: 10px;
+    color: #c7d5e0;
+    cursor: pointer;
+    transition: transform .2s, box-shadow .2s;
+    display: flex;
+    flex-direction: column;
+}
+
+.game-card img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.game-card h3 {
+    font-size: 15px;
+    margin: 10px 0 4px;
+    color: #66c0f4;
+}
+
+.game-card p {
+    font-size: 12px;
+    opacity: .85;
+    max-height: 45px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.game-page-container {
+    margin-top: 100px;
+    padding: 25px;
+}
+
+.game-header {
+    display: flex;
+    gap: 30px;
+    background: #2a475e;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.game-cover-large {
+    width: 260px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+
+.game-info h1 {
+    margin: 0 0 10px 0;
+    color: #66c0f4;
+    font-size: 28px;
+}
+
+.reviews-container {
+    margin-top: 30px;
+}
+
+.review-card {
+    background: #1b2838;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    border-left: 4px solid #66c0f4;
+}
