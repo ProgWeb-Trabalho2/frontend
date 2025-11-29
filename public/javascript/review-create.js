@@ -25,39 +25,39 @@ function getLoggedUserId() {
         return 0;
     }
 }
-function loadReview() {
+function loadGames() {
     return __awaiter(this, void 0, void 0, function* () {
-        var _a;
-        const reviewId = localStorage.getItem("editReviewId");
-        if (!reviewId)
-            return window.location.href = "profile.html";
-        const review = yield api(`/reviews/${reviewId}/`);
-        const gamesRes = yield fetch("./data/games.json");
-        const games = yield gamesRes.json();
-        const gameName = ((_a = games.find((g) => g.id === review.game_id)) === null || _a === void 0 ? void 0 : _a.name) || "Jogo desconhecido";
-        document.getElementById("game-name").innerText = gameName;
-        document.getElementById("score").value = review.score.toString();
-        document.getElementById("comment").value = review.comment;
+        const res = yield fetch("../data/games.json");
+        const games = yield res.json();
+        const select = document.getElementById("game-select");
+        games.forEach((game) => {
+            const opt = document.createElement("option");
+            opt.value = game.id.toString();
+            opt.textContent = game.name;
+            select.appendChild(opt);
+        });
     });
 }
 function saveReview() {
     return __awaiter(this, void 0, void 0, function* () {
-        const reviewId = localStorage.getItem("editReviewId");
-        const loggedId = getLoggedUserId();
-        if (!reviewId || !loggedId)
-            return;
+        const userId = getLoggedUserId();
+        if (!userId) {
+            alert("Usuário não autenticado!");
+            return window.location.href = "login.html";
+        }
+        const game = document.getElementById("game-select").value;
         const score = Number(document.getElementById("score").value);
         const comment = document.getElementById("comment").value;
-        yield api(`/reviews/${reviewId}/`, {
-            method: "PATCH",
-            body: JSON.stringify({ score, comment })
+        yield api(`/reviews/user/${userId}/`, {
+            method: "POST",
+            body: JSON.stringify({ game_id: Number(game), score, comment })
         });
-        document.getElementById("msg").innerText = "Alterações salvas com sucesso!";
+        document.getElementById("msg").innerText = "Review criada com sucesso!";
         setTimeout(() => {
             window.location.href = "profile.html";
         }, 1000);
     });
 }
-document.getElementById("save-edit").addEventListener("click", saveReview);
-loadReview();
-//# sourceMappingURL=edit-profile.js.map
+document.getElementById("save-review").addEventListener("click", saveReview);
+loadGames();
+//# sourceMappingURL=review-create.js.map

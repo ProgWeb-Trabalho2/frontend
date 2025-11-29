@@ -1,45 +1,55 @@
-import { api, setAccessToken } from "./api.js";
+import { api } from "./api.js";
 
-async function loadProfile() {
-    const res = await api("/auth/me/");
+function getLoggedUserId(): number {
+    const token = localStorage.getItem("accessToken");
+    if (!token) return 0;
 
-    if (!res.username) {
-        return window.location.href = "login.html";
+    try {
+        const parts = token.split('.');
+        const payloadBase64 = parts?.[1] ?? "";
+        if (!payloadBase64) return 0;
+
+        const payload = JSON.parse(atob(payloadBase64));
+        return Number(payload.user_id) || 0;
+    } catch {
+        return 0;
     }
-
-    (document.getElementById("avatar-preview") as HTMLImageElement).src =
-        res.avatar || "./images/default-avatar.png";
-
-    (document.getElementById("bio-input") as HTMLTextAreaElement).value =
-        res.bio || "";
 }
 
-async function saveProfile() {
-    const avatarInput = document.getElementById("avatar-input") as HTMLInputElement;
-    const bioInput = document.getElementById("bio-input") as HTMLTextAreaElement;
+async function loadReview() {
+    const reviewId = localStorage.getItem("editReviewId");
+    if (!reviewId) return window.location.href = "profile.html";
 
-    const formData = new FormData();
-    formData.append("bio", bioInput.value);
+    const review = await api(`/reviews/${reviewId}/`);
+    const gamesRes = await fetch("./data/games.json");
+    const games = await gamesRes.json();
 
-    if (avatarInput.files && avatarInput.files[0]) {
-        formData.append("avatar", avatarInput.files[0]);
-    }
+    const gameName = games.find((g: any) => g.id === review.game_id)?.name || "Jogo desconhecido";
+    (document.getElementById("game-name") as HTMLElement).innerText = gameName;
 
-    const res = await fetch("http://localhost:8000/api/auth/me/", {
+    (document.getElementById("score") as HTMLInputElement).value = review.score.toString();
+    (document.getElementById("comment") as HTMLTextAreaElement).value = review.comment;
+}
+
+async function saveReview() {
+    const reviewId = localStorage.getItem("editReviewId");
+    const loggedId = getLoggedUserId();
+    if (!reviewId || !loggedId) return;
+
+    const score = Number((document.getElementById("score") as HTMLInputElement).value);
+    const comment = (document.getElementById("comment") as HTMLTextAreaElement).value;
+
+    await api(`/reviews/${reviewId}/`, {
         method: "PATCH",
-        headers: {
-            "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
-        },
-        body: formData
+        body: JSON.stringify({ score, comment })
     });
 
-    if (res.ok) {
-        document.getElementById("status-msg")!.textContent = "Perfil atualizado!";
-        loadProfile();
-    } else {
-        document.getElementById("status-msg")!.textContent = "Erro ao salvar.";
-    }
+    (document.getElementById("msg") as HTMLElement).innerText = "Alterações salvas com sucesso!";
+
+    setTimeout(() => {
+        window.location.href = "profile.html";
+    }, 1000);
 }
 
-document.getElementById("save-btn")!.addEventListener("click", saveProfile);
-loadProfile();
+document.getElementById("save-edit")!.addEventListener("click", saveReview);
+loadReview();
