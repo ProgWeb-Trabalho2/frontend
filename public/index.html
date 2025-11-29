@@ -4,9 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gamerboxd</title>
-    <script src="javascript/constantes.js"></script>
-    <script src="javascript/script.js"></script>
+    <link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
+    <div id="navbar"></div>
+    
+    <script>
+        fetch("./components/navbar.html")
+            .then(r => r.text())
+            .then(h => document.getElementById("navbar").innerHTML = h);
+    </script>
 </body>
 </html>
