@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./css/style.css" />
+    <title>Editar Perfil</title>
+</head>
+<body>
+    <div id="navbar"></div>
+
+    <main class="container" style="margin-top:120px;">
+        <h1>Editar Perfil</h1>
+
+        <div class="profile-box">
+            <img id="avatar-preview" class="avatar-edit" src="" alt="Avatar" />
+
+            <label class="btn-upload">
+                Alterar Avatar
+                <input type="file" id="avatar-input" accept="image/*" hidden>
+            </label>
+
+            <textarea id="bio-input" placeholder="Sua biografia..." rows="4"></textarea>
+
+            <button id="save-btn" class="btn-primary">
+                Salvar alterações
+            </button>
+        </div>
+
+        <p id="status-msg"></p>
+    </main>
+
+    <script type="module" src="./javascript/edit-profile.js"></script>
+
+    <script>
+        fetch("./components/navbar.html")
+            .then(r => r.text())
+            .then(h => document.getElementById("navbar").innerHTML = h);
+    </script>
+</body>
+</html>

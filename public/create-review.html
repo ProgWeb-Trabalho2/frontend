@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Criar Review</title>
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+    <div id="navbar"></div>
+
+    <main class="container" style="margin-top:120px;">
+        <h1>Nova Review</h1>
+
+        <div class="review-box">
+            <select id="game-select" class="input-field"></select>
+
+            <input type="number" id="score" min="0" max="10" class="input-field"
+                   placeholder="Nota (0 a 10)">
+
+            <textarea id="comment" rows="4" class="input-field" placeholder="Seu comentário"></textarea>
+
+            <button id="save-review" class="btn-primary">Salvar Review</button>
+        </div>
+
+        <p id="msg"></p>
+    </main>
+
+    <script type="module" src="./javascript/review-create.js"></script>
+
+    <script>
+        fetch("./components/navbar.html")
+            .then(r => r.text())
+            .then(h => document.getElementById("navbar").innerHTML = h);
+    </script>
+</body>
+</html>
