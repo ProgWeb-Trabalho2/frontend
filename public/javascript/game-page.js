@@ -31,18 +31,18 @@ function loadGame() {
             game.summary || "Sem descrição deste jogo disponível.";
         (_a = document
             .getElementById("create-review-btn")) === null || _a === void 0 ? void 0 : _a.addEventListener("click", () => {
-            window.location.href = `create-review.html?game=${id}`;
+            window.location.href = `create-review.html?gameId=${id}`;
         });
         yield loadGameReviews(id);
     });
 }
 function loadGameReviews(gameId) {
     return __awaiter(this, void 0, void 0, function* () {
-        const response = yield fetch(`${backendAddress}api/reviews/game/${gameId}/`);
+        const response = yield fetch(`${backendAddress}/api/reviews/game/${gameId}`);
         const reviews = yield response.json();
         const container = document.getElementById("game-reviews");
         container.innerHTML = "<h2>Reviews</h2>";
-        if (!reviews) {
+        if (!reviews || reviews.length === 0) {
             container.innerHTML += "<p>Este jogo ainda não possui reviews.</p>";
             return;
         }
@@ -50,10 +50,14 @@ function loadGameReviews(gameId) {
             const div = document.createElement("div");
             div.className = "review-card";
             div.innerHTML = `
-            <p><strong>${review.user_username}</strong> avaliou:</p>
-            <p>⭐ ${review.score}/10</p>
-            <p>${review.comment}</p>
-        `;
+        <p><strong>${review.user_username}</strong> avaliou:</p>
+        <p>⭐ ${review.score}/10</p>
+        <p>${review.comment}</p>
+    `;
+            div.style.cursor = "pointer";
+            div.addEventListener("click", () => {
+                window.location.href = `profile.html?user=${review.user_id}`;
+            });
             container.appendChild(div);
         });
     });

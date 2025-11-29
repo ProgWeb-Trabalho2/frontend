@@ -9,55 +9,48 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import { api } from "./api.js";
 function getLoggedUserId() {
-    var _a;
     const token = localStorage.getItem("accessToken");
     if (!token)
         return 0;
     try {
-        const parts = token.split('.');
-        const payloadBase64 = (_a = parts === null || parts === void 0 ? void 0 : parts[1]) !== null && _a !== void 0 ? _a : "";
+        const [, payloadBase64 = ""] = token.split(".");
         if (!payloadBase64)
             return 0;
         const payload = JSON.parse(atob(payloadBase64));
         return Number(payload.user_id) || 0;
     }
-    catch (_b) {
+    catch (_a) {
         return 0;
     }
 }
-function loadGames() {
-    return __awaiter(this, void 0, void 0, function* () {
-        const res = yield fetch("../data/games.json");
-        const games = yield res.json();
-        const select = document.getElementById("game-select");
-        games.forEach((game) => {
-            const opt = document.createElement("option");
-            opt.value = game.id.toString();
-            opt.textContent = game.name;
-            select.appendChild(opt);
-        });
-    });
-}
+const params = new URLSearchParams(window.location.search);
+const gameId = Number(params.get("gameId"));
 function saveReview() {
     return __awaiter(this, void 0, void 0, function* () {
         const userId = getLoggedUserId();
         if (!userId) {
-            alert("Usuário não autenticado!");
+            alert("Você precisa estar logado.");
             return window.location.href = "login.html";
         }
-        const game = document.getElementById("game-select").value;
-        const score = Number(document.getElementById("score").value);
-        const comment = document.getElementById("comment").value;
+        const scoreEl = document.getElementById("score");
+        const commentEl = document.getElementById("comment");
+        if (!scoreEl || !commentEl) {
+            console.error("Inputs não encontrados no DOM!");
+            return;
+        }
+        const score = Number(scoreEl.value);
+        const comment = commentEl.value;
         yield api(`/reviews/user/${userId}/`, {
             method: "POST",
-            body: JSON.stringify({ game_id: Number(game), score, comment })
+            body: JSON.stringify({ game_id: gameId, score, comment })
         });
-        document.getElementById("msg").innerText = "Review criada com sucesso!";
+        document.getElementById("msg").innerText =
+            "Review criada com sucesso!";
         setTimeout(() => {
-            window.location.href = "profile.html";
-        }, 1000);
+            window.location.href = `jogo.html?id=${gameId}`;
+        }, 1200);
     });
 }
-document.getElementById("save-review").addEventListener("click", saveReview);
-loadGames();
+document.getElementById("save-review")
+    .addEventListener("click", () => saveReview());
 //# sourceMappingURL=review-create.js.map

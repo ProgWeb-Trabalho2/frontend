@@ -29,20 +29,20 @@ async function loadGame() {
   document
     .getElementById("create-review-btn")
     ?.addEventListener("click", () => {
-      window.location.href = `create-review.html?game=${id}`;
+      window.location.href = `create-review.html?gameId=${id}`;
     });
 
   await loadGameReviews(id);
 }
 
 async function loadGameReviews(gameId: number) {
-  const response = await fetch(`${backendAddress}api/reviews/game/${gameId}/`);
+  const response = await fetch(`${backendAddress}/api/reviews/game/${gameId}`);
   const reviews = await response.json();
 
   const container = document.getElementById("game-reviews")!;
   container.innerHTML = "<h2>Reviews</h2>";
 
-  if (!reviews) {
+  if (!reviews || reviews.length === 0) {
     container.innerHTML += "<p>Este jogo ainda não possui reviews.</p>";
     return;
   }
@@ -51,12 +51,19 @@ async function loadGameReviews(gameId: number) {
     const div = document.createElement("div");
     div.className = "review-card";
     div.innerHTML = `
-            <p><strong>${review.user_username}</strong> avaliou:</p>
-            <p>⭐ ${review.score}/10</p>
-            <p>${review.comment}</p>
-        `;
+        <p><strong>${review.user_username}</strong> avaliou:</p>
+        <p>⭐ ${review.score}/10</p>
+        <p>${review.comment}</p>
+    `;
+
+    div.style.cursor = "pointer";
+    div.addEventListener("click", () => {
+        window.location.href = `profile.html?user=${review.user_id}`;
+    });
+
     container.appendChild(div);
-  });
+    });
+
 }
 
 loadGame();

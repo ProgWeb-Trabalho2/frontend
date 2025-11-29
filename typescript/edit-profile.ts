@@ -1,55 +1,54 @@
 import { api } from "./api.js";
 
-function getLoggedUserId(): number {
-    const token = localStorage.getItem("accessToken");
-    if (!token) return 0;
+let selectedAvatarFile: File | null = null;
 
-    try {
-        const parts = token.split('.');
-        const payloadBase64 = parts?.[1] ?? "";
-        if (!payloadBase64) return 0;
+async function loadProfile() {
+    const user = await api("/auth/me/");
 
-        const payload = JSON.parse(atob(payloadBase64));
-        return Number(payload.user_id) || 0;
-    } catch {
-        return 0;
-    }
+    const avatarEl = document.getElementById("avatar-preview") as HTMLImageElement;
+    avatarEl.src = user.avatar || "./images/default-avatar.png";
+
+    const bioInput = document.getElementById("bio-input") as HTMLTextAreaElement;
+    bioInput.value = user.bio || "";
 }
 
-async function loadReview() {
-    const reviewId = localStorage.getItem("editReviewId");
-    if (!reviewId) return window.location.href = "profile.html";
+async function handleAvatarChange(e: Event) {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (!file) return;
 
-    const review = await api(`/reviews/${reviewId}/`);
-    const gamesRes = await fetch("./data/games.json");
-    const games = await gamesRes.json();
-
-    const gameName = games.find((g: any) => g.id === review.game_id)?.name || "Jogo desconhecido";
-    (document.getElementById("game-name") as HTMLElement).innerText = gameName;
-
-    (document.getElementById("score") as HTMLInputElement).value = review.score.toString();
-    (document.getElementById("comment") as HTMLTextAreaElement).value = review.comment;
+    selectedAvatarFile = file;
+    const preview = document.getElementById("avatar-preview") as HTMLImageElement;
+    preview.src = URL.createObjectURL(file);
 }
 
-async function saveReview() {
-    const reviewId = localStorage.getItem("editReviewId");
-    const loggedId = getLoggedUserId();
-    if (!reviewId || !loggedId) return;
+async function handleSaveProfile() {
+    const msgEl = document.getElementById("status-msg") as HTMLElement;
+    msgEl.innerText = "Salvando...";
 
-    const score = Number((document.getElementById("score") as HTMLInputElement).value);
-    const comment = (document.getElementById("comment") as HTMLTextAreaElement).value;
+    const bio = (document.getElementById("bio-input") as HTMLTextAreaElement).value;
 
-    await api(`/reviews/${reviewId}/`, {
+    await api("/auth/me/", {
         method: "PATCH",
-        body: JSON.stringify({ score, comment })
+        body: JSON.stringify({ bio }),
     });
 
-    (document.getElementById("msg") as HTMLElement).innerText = "Alterações salvas com sucesso!";
+    if (selectedAvatarFile) {
+        const formData = new FormData();
+        formData.append("avatar", selectedAvatarFile);
 
-    setTimeout(() => {
-        window.location.href = "profile.html";
-    }, 1000);
+        await api("/auth/me/", {
+            method: "PATCH",
+            body: formData,
+        });
+    }
+
+    msgEl.innerText = "Perfil atualizado com sucesso!";
+
+    setTimeout(loadProfile, 1000);
 }
 
-document.getElementById("save-edit")!.addEventListener("click", saveReview);
-loadReview();
+document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("avatar-input")?.addEventListener("change", handleAvatarChange);
+    document.getElementById("save-btn")?.addEventListener("click", handleSaveProfile);
+    loadProfile();
+});

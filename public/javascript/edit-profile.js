@@ -8,56 +8,52 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { api } from "./api.js";
-function getLoggedUserId() {
-    var _a;
-    const token = localStorage.getItem("accessToken");
-    if (!token)
-        return 0;
-    try {
-        const parts = token.split('.');
-        const payloadBase64 = (_a = parts === null || parts === void 0 ? void 0 : parts[1]) !== null && _a !== void 0 ? _a : "";
-        if (!payloadBase64)
-            return 0;
-        const payload = JSON.parse(atob(payloadBase64));
-        return Number(payload.user_id) || 0;
-    }
-    catch (_b) {
-        return 0;
-    }
+let selectedAvatarFile = null;
+function loadProfile() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const user = yield api("/auth/me/");
+        const avatarEl = document.getElementById("avatar-preview");
+        avatarEl.src = user.avatar || "./images/default-avatar.png";
+        const bioInput = document.getElementById("bio-input");
+        bioInput.value = user.bio || "";
+    });
 }
-function loadReview() {
+function handleAvatarChange(e) {
     return __awaiter(this, void 0, void 0, function* () {
         var _a;
-        const reviewId = localStorage.getItem("editReviewId");
-        if (!reviewId)
-            return window.location.href = "profile.html";
-        const review = yield api(`/reviews/${reviewId}/`);
-        const gamesRes = yield fetch("./data/games.json");
-        const games = yield gamesRes.json();
-        const gameName = ((_a = games.find((g) => g.id === review.game_id)) === null || _a === void 0 ? void 0 : _a.name) || "Jogo desconhecido";
-        document.getElementById("game-name").innerText = gameName;
-        document.getElementById("score").value = review.score.toString();
-        document.getElementById("comment").value = review.comment;
-    });
-}
-function saveReview() {
-    return __awaiter(this, void 0, void 0, function* () {
-        const reviewId = localStorage.getItem("editReviewId");
-        const loggedId = getLoggedUserId();
-        if (!reviewId || !loggedId)
+        const file = (_a = e.target.files) === null || _a === void 0 ? void 0 : _a[0];
+        if (!file)
             return;
-        const score = Number(document.getElementById("score").value);
-        const comment = document.getElementById("comment").value;
-        yield api(`/reviews/${reviewId}/`, {
-            method: "PATCH",
-            body: JSON.stringify({ score, comment })
-        });
-        document.getElementById("msg").innerText = "Alterações salvas com sucesso!";
-        setTimeout(() => {
-            window.location.href = "profile.html";
-        }, 1000);
+        selectedAvatarFile = file;
+        const preview = document.getElementById("avatar-preview");
+        preview.src = URL.createObjectURL(file);
     });
 }
-document.getElementById("save-edit").addEventListener("click", saveReview);
-loadReview();
+function handleSaveProfile() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const msgEl = document.getElementById("status-msg");
+        msgEl.innerText = "Salvando...";
+        const bio = document.getElementById("bio-input").value;
+        yield api("/auth/me/", {
+            method: "PATCH",
+            body: JSON.stringify({ bio }),
+        });
+        if (selectedAvatarFile) {
+            const formData = new FormData();
+            formData.append("avatar", selectedAvatarFile);
+            yield api("/auth/me/", {
+                method: "PATCH",
+                body: formData,
+            });
+        }
+        msgEl.innerText = "Perfil atualizado com sucesso!";
+        setTimeout(loadProfile, 1000);
+    });
+}
+document.addEventListener("DOMContentLoaded", () => {
+    var _a, _b;
+    (_a = document.getElementById("avatar-input")) === null || _a === void 0 ? void 0 : _a.addEventListener("change", handleAvatarChange);
+    (_b = document.getElementById("save-btn")) === null || _b === void 0 ? void 0 : _b.addEventListener("click", handleSaveProfile);
+    loadProfile();
+});
 //# sourceMappingURL=edit-profile.js.map

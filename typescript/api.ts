@@ -12,10 +12,19 @@ export function clearToken() {
 }
 
 export async function api(endpoint: string, options: RequestInit = {}) {
-    const headers: any = {
-        "Content-Type": "application/json",
-        ...(options.headers || {})
-    };
+    const headers: Record<string, string> = {};
+
+    if (options.headers instanceof Headers) {
+        options.headers.forEach((value, key) => {
+            headers[key] = value;
+        });
+    } else if (typeof options.headers === "object" && options.headers !== null) {
+        Object.assign(headers, options.headers as Record<string, string>);
+    }
+
+    if (!(options.body instanceof FormData)) {
+        headers["Content-Type"] = "application/json";
+    }
 
     if (accessToken) {
         headers["Authorization"] = `Bearer ${accessToken}`;
@@ -26,5 +35,21 @@ export async function api(endpoint: string, options: RequestInit = {}) {
         headers
     });
 
-    return res.json();
+    if (res.status === 401) {
+        clearToken();
+        window.location.href = "login.html";
+        throw new Error("Unauthorized");
+    }
+
+    if (!res.ok) {
+        const text = await res.text();
+        console.error("API Error:", text);
+        throw new Error(`HTTP ${res.status}`);
+    }
+
+    try {
+        return await res.json();
+    } catch {
+        return null;
+    }
 }

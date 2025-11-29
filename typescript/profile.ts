@@ -1,3 +1,4 @@
+import { backendAddress } from "./constantes.js";
 import { api } from "./api.js";
 
 function getUserIdFromURL(): number | null {
@@ -62,28 +63,25 @@ async function loadReviews(userId: number, canEdit: boolean) {
     const container = document.querySelector(".profile-reviews") as HTMLElement;
     container.innerHTML = "<h2>Reviews Recentes</h2>";
 
-    const reviews = await api(`/reviews/user/${userId}/`, {
-        method: "GET"
-    });
+    const reviews = await api(`/reviews/user/${userId}/`);
 
     if (!Array.isArray(reviews) || reviews.length === 0) {
         container.innerHTML += "<p>Nenhuma review encontrada.</p>";
         return;
     }
 
-    const res = await fetch("./data/games.json");
-    const games = await res.json();
-
-    reviews.forEach((r: any) => {
-        const gameName = games.find((g: any) => g.id === r.game_id)?.name || "Jogo desconhecido";
+    for (const r of reviews) {
+        const gameRes = await fetch(`${backendAddress}/api/games/search-by-id/${r.game_id}/`);
+        const gameData = await gameRes.json();
+        const game = gameData[0];
 
         const card = document.createElement("div");
         card.className = "review-card";
         card.innerHTML = `
-            <img class="review-img" src="./images/game-placeholder.jpg" alt="Jogo">
+            <img class="review-img" src="${r.game.cover ?? './images/game-placeholder.jpg'}" alt="${game.name}">
             <div class="review-content">
                 <div class="review-header">
-                    <h3>${gameName}</h3>
+                    <h3>${r.game.name}</h3>
                     <span class="review-score">⭐ ${r.score}/10</span>
                 </div>
                 <p>${r.comment}</p>
@@ -95,7 +93,7 @@ async function loadReviews(userId: number, canEdit: boolean) {
             </div>
         `;
         container.appendChild(card);
-    });
+    }
 
     if (canEdit) addReviewActions();
 }

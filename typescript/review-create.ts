@@ -5,8 +5,7 @@ function getLoggedUserId(): number {
     if (!token) return 0;
 
     try {
-        const parts = token.split('.');
-        const payloadBase64 = parts?.[1] ?? "";
+        const [, payloadBase64 = ""] = token.split(".");
         if (!payloadBase64) return 0;
 
         const payload = JSON.parse(atob(payloadBase64));
@@ -16,41 +15,39 @@ function getLoggedUserId(): number {
     }
 }
 
-async function loadGames() {
-    const res = await fetch("../data/games.json");
-    const games = await res.json();
-
-    const select = document.getElementById("game-select") as HTMLSelectElement;
-    games.forEach((game: any) => {
-        const opt = document.createElement("option");
-        opt.value = game.id.toString();
-        opt.textContent = game.name;
-        select.appendChild(opt);
-    });
-}
+const params = new URLSearchParams(window.location.search);
+const gameId = Number(params.get("gameId"));
 
 async function saveReview() {
     const userId = getLoggedUserId();
     if (!userId) {
-        alert("Usuário não autenticado!");
+        alert("Você precisa estar logado.");
         return window.location.href = "login.html";
     }
 
-    const game = (document.getElementById("game-select") as HTMLSelectElement).value;
-    const score = Number((document.getElementById("score") as HTMLInputElement).value);
-    const comment = (document.getElementById("comment") as HTMLTextAreaElement).value;
+    const scoreEl = document.getElementById("score") as HTMLInputElement;
+    const commentEl = document.getElementById("comment") as HTMLTextAreaElement;
+
+    if (!scoreEl || !commentEl) {
+        console.error("Inputs não encontrados no DOM!");
+        return;
+    }
+
+    const score = Number(scoreEl.value);
+    const comment = commentEl.value;
 
     await api(`/reviews/user/${userId}/`, {
         method: "POST",
-        body: JSON.stringify({ game_id: Number(game), score, comment })
+        body: JSON.stringify({ game_id: gameId, score, comment })
     });
 
-    (document.getElementById("msg") as HTMLElement).innerText = "Review criada com sucesso!";
+    (document.getElementById("msg") as HTMLElement).innerText =
+        "Review criada com sucesso!";
 
     setTimeout(() => {
-        window.location.href = "profile.html";
-    }, 1000);
+        window.location.href = `jogo.html?id=${gameId}`;
+    }, 1200);
 }
 
-document.getElementById("save-review")!.addEventListener("click", saveReview);
-loadGames();
+document.getElementById("save-review")!
+    .addEventListener("click", () => saveReview());
