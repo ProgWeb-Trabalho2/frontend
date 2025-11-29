@@ -123,6 +123,8 @@ a:hover {
     width: 350px;
     margin: auto;
     text-align: center;
+    display: flex;
+    flex-direction: column;
 }
 
 .avatar-edit {
@@ -362,4 +364,15 @@ a:hover {
 
 .icon:hover {
     background: var(--blue);
+}
+
+textarea {
+    width: 100%;
+    background: #1b2838;
+    color: var(--text-light);
+    border: 1px solid #444;
+    margin-bottom: 15px;
+    border-radius: 6px;
+    padding: 10px;
+    resize: none;
 }
