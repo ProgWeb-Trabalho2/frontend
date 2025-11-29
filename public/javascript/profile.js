@@ -8,6 +8,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { api } from "./api.js";
+import { backendAddress } from "./constantes.js";
+import { Game } from "./Game.js";
 function getUserIdFromURL() {
     const params = new URLSearchParams(window.location.search);
     const param = params.get("user");
@@ -19,7 +21,7 @@ function getLoggedUserId() {
     if (!token)
         return 0;
     try {
-        const parts = token.split('.');
+        const parts = token.split(".");
         const payloadBase64 = (_a = parts === null || parts === void 0 ? void 0 : parts[1]) !== null && _a !== void 0 ? _a : "";
         if (!payloadBase64)
             return 0;
@@ -36,12 +38,10 @@ function loadProfile() {
         const loggedId = getLoggedUserId();
         const isOwnProfile = !urlUserId || urlUserId === loggedId;
         const userIdToLoad = isOwnProfile ? loggedId : urlUserId;
-        const endpoint = isOwnProfile ?
-            "/auth/me/" :
-            `/auth/user/${userIdToLoad}/`;
+        const endpoint = isOwnProfile ? "/auth/me/" : `/auth/user/${userIdToLoad}/`;
         const result = yield api(endpoint);
         if (!result.username) {
-            return window.location.href = "login.html";
+            return (window.location.href = "login.html");
         }
         document.getElementById("avatar").src =
             result.avatar || "./images/default-avatar.png";
@@ -64,49 +64,51 @@ function loadReviews(userId, canEdit) {
         const container = document.querySelector(".profile-reviews");
         container.innerHTML = "<h2>Reviews Recentes</h2>";
         const reviews = yield api(`/reviews/user/${userId}/`, {
-            method: "GET"
+            method: "GET",
         });
         if (!Array.isArray(reviews) || reviews.length === 0) {
             container.innerHTML += "<p>Nenhuma review encontrada.</p>";
             return;
         }
-        const res = yield fetch("./data/games.json");
-        const games = yield res.json();
-        reviews.forEach((r) => {
-            var _a;
-            const gameName = ((_a = games.find((g) => g.id === r.game_id)) === null || _a === void 0 ? void 0 : _a.name) || "Jogo desconhecido";
+        reviews.forEach((r) => __awaiter(this, void 0, void 0, function* () {
+            const game = yield fetchGame(r.game_id.toString());
+            if (!game)
+                return;
+            console.log(game);
             const card = document.createElement("div");
             card.className = "review-card";
             card.innerHTML = `
-            <img class="review-img" src="./images/game-placeholder.jpg" alt="Jogo">
+            <img class="review-img" src="${game.coverUrl}" alt="Jogo">
             <div class="review-content">
                 <div class="review-header">
-                    <h3>${gameName}</h3>
+                    <h3>${game.name}</h3>
                     <span class="review-score">⭐ ${r.score}/10</span>
                 </div>
                 <p>${r.comment}</p>
-                ${canEdit ? `
+                ${canEdit
+                ? `
                 <div class="review-actions">
                     <span class="icon edit-btn" data-review-id="${r.id}">✏️</span>
                     <span class="icon delete-btn" data-review-id="${r.id}">❌</span>
-                </div>` : ""}
+                </div>`
+                : ""}
             </div>
         `;
             container.appendChild(card);
-        });
+        }));
         if (canEdit)
             addReviewActions();
     });
 }
 function addReviewActions() {
-    document.querySelectorAll(".delete-btn").forEach(btn => {
+    document.querySelectorAll(".delete-btn").forEach((btn) => {
         btn.addEventListener("click", () => __awaiter(this, void 0, void 0, function* () {
             const id = btn.dataset.reviewId;
             yield api(`/reviews/${id}/`, { method: "DELETE" });
             loadProfile();
         }));
     });
-    document.querySelectorAll(".edit-btn").forEach(btn => {
+    document.querySelectorAll(".edit-btn").forEach((btn) => {
         btn.addEventListener("click", () => {
             const id = btn.dataset.reviewId;
             localStorage.setItem("editReviewId", id);
@@ -114,5 +116,45 @@ function addReviewActions() {
         });
     });
 }
-loadProfile();
+function fetchGame(id) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const response = yield fetch(backendAddress + "games/search-by-id/" + id);
+        if (!response.ok)
+            return;
+        const data = yield response.json();
+        return new Game(data[0]);
+    });
+}
+// Delegação: adiciona 1 listener global que lida com todos os botões
+document.addEventListener("click", (ev) => {
+    const target = ev.target;
+    if (!target)
+        return;
+    // Se o click for em um filho do botão (ex: emoji/text node), procuramos o elemento pai com a classe
+    const editBtn = target.closest(".edit-btn");
+    if (editBtn) {
+        const id = editBtn.dataset.reviewId;
+        if (!id)
+            return console.warn("edit-btn sem data-review-id");
+        localStorage.setItem("editReviewId", id);
+        window.location.href = "edit-review.html";
+        return;
+    }
+    const deleteBtn = target.closest(".delete-btn");
+    if (deleteBtn) {
+        const id = deleteBtn.dataset.reviewId;
+        if (!id)
+            return console.warn("delete-btn sem data-review-id");
+        // confirmação opcional
+        if (!confirm("Deseja remover esta review?"))
+            return;
+        api(`/reviews/${id}/`, { method: "DELETE" })
+            .then(() => loadProfile())
+            .catch((err) => console.error("Erro ao deletar:", err));
+        return;
+    }
+});
+onload = () => {
+    loadProfile();
+};
 //# sourceMappingURL=profile.js.map

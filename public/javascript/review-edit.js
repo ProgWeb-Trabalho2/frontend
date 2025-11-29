@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 function loadEditForm() {
     return __awaiter(this, void 0, void 0, function* () {
-        const index = Number(localStorage.getItem("editReviewIndex"));
+        const index = Number(localStorage.getItem("editReviewId"));
         const list = JSON.parse(localStorage.getItem("reviews") || "[]");
         const review = list[index];
         const res = yield fetch("./data/games.json");
@@ -24,14 +24,15 @@ function loadEditForm() {
             select.appendChild(opt);
         });
         document.getElementById("score").value = review.score;
-        document.getElementById("comment").value = review.comment;
+        document.getElementById("comment").value =
+            review.comment;
         document.getElementById("update-btn").addEventListener("click", () => {
             review.game = select.value;
             review.score = document.getElementById("score").value;
             review.comment = document.getElementById("comment").value;
             list[index] = review;
             localStorage.setItem("reviews", JSON.stringify(list));
-            localStorage.removeItem("editReviewIndex");
+            localStorage.removeItem("editReviewId");
             window.location.href = "profile.html";
         });
     });
