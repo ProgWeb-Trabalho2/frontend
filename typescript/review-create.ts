@@ -1,70 +1,53 @@
 import { api } from "./api.js";
-import { backendAddress } from "./constantes.js";
-import { Game } from "./Game.js";
-
-const params = new URLSearchParams(window.location.search);
-const gameID = params.get("id");
 
 function getLoggedUserId(): number {
-  const token = localStorage.getItem("accessToken");
-  if (!token) return 0;
+    const token = localStorage.getItem("accessToken");
+    if (!token) return 0;
 
-  try {
-    const parts = token.split(".");
-    const payloadBase64 = parts?.[1] ?? "";
-    if (!payloadBase64) return 0;
+    try {
+        const [, payloadBase64 = ""] = token.split(".");
+        if (!payloadBase64) return 0;
 
-    const payload = JSON.parse(atob(payloadBase64));
-    return Number(payload.user_id) || 0;
-  } catch {
-    return 0;
-  }
+        const payload = JSON.parse(atob(payloadBase64));
+        return Number(payload.user_id) || 0;
+    } catch {
+        return 0;
+    }
 }
 
-async function fetchGame(id: string) {
-  const response = await fetch(backendAddress + "games/search-by-id/" + id);
-
-  if (!response.ok) return;
-
-  const data = await response.json();
-  return new Game(data[0]);
-}
-
-async function loadGame() {
-  if (!gameID) return;
-
-  const game = await fetchGame(gameID?.toString());
-  if (!game) return;
-  console.log(game);
-
-  document.getElementById("game-select")!.textContent = game.name;
-}
+const params = new URLSearchParams(window.location.search);
+const gameId = Number(params.get("gameId"));
 
 async function saveReview() {
-  const userId = getLoggedUserId();
-  if (!userId) {
-    alert("Usuário não autenticado!");
-    return (window.location.href = "login.html");
-  }
+    const userId = getLoggedUserId();
+    if (!userId) {
+        alert("Você precisa estar logado.");
+        return window.location.href = "login.html";
+    }
 
-  const score = Number(
-    (document.getElementById("score") as HTMLInputElement).value
-  );
-  const comment = (document.getElementById("comment") as HTMLTextAreaElement)
-    .value;
+    const scoreEl = document.getElementById("score") as HTMLInputElement;
+    const commentEl = document.getElementById("comment") as HTMLTextAreaElement;
 
-  await api(`/reviews/user/${userId}/`, {
-    method: "POST",
-    body: JSON.stringify({ game_id: gameID, score, comment }),
-  });
+    if (!scoreEl || !commentEl) {
+        console.error("Inputs não encontrados no DOM!");
+        return;
+    }
 
-  (document.getElementById("msg") as HTMLElement).innerText =
-    "Review criada com sucesso!";
+    const score = Number(scoreEl.value);
+    const comment = commentEl.value;
 
-  setTimeout(() => {
-    window.location.href = "profile.html";
-  }, 1000);
+    await api(`/reviews/user/${userId}/`, {
+        method: "POST",
+        body: JSON.stringify({ game_id: gameId, score, comment })
+    });
+
+    (document.getElementById("msg") as HTMLElement).innerText =
+        "Review criada com sucesso!";
+
+    setTimeout(() => {
+        window.location.href = `jogo.html?id=${gameId}`;
+    }, 1200);
 }
 
-document.getElementById("save-review")!.addEventListener("click", saveReview);
-loadGame();
+document.getElementById("save-review")!
+    .addEventListener("click", () => saveReview());

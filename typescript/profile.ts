@@ -1,5 +1,5 @@
-import { api } from "./api.js";
 import { backendAddress } from "./constantes.js";
+import { api } from "./api.js";
 import { Game } from "./Game.js";
 
 function getUserIdFromURL(): number | null {
@@ -64,29 +64,25 @@ async function loadReviews(userId: number, canEdit: boolean) {
   const container = document.querySelector(".profile-reviews") as HTMLElement;
   container.innerHTML = "<h2>Reviews Recentes</h2>";
 
-  const reviews = await api(`/reviews/user/${userId}/`, {
-    method: "GET",
-  });
+    const reviews = await api(`/reviews/user/${userId}/`);
 
   if (!Array.isArray(reviews) || reviews.length === 0) {
     container.innerHTML += "<p>Nenhuma review encontrada.</p>";
     return;
   }
 
-  reviews.forEach(async (r: any) => {
-    const game = await fetchGame(r.game_id.toString());
+    for (const r of reviews) {
+        const gameRes = await fetch(`${backendAddress}/api/games/search-by-id/${r.game_id}/`);
+        const gameData = await gameRes.json();
+        const game = gameData[0];
 
-    if (!game) return;
-
-    console.log(game);
-
-    const card = document.createElement("div");
-    card.className = "review-card";
-    card.innerHTML = `
-            <img class="review-img" src="${game.coverUrl}" alt="Jogo">
+        const card = document.createElement("div");
+        card.className = "review-card";
+        card.innerHTML = `
+            <img class="review-img" src="${r.game.cover ?? './images/game-placeholder.jpg'}" alt="${game.name}">
             <div class="review-content">
                 <div class="review-header">
-                    <h3>${game.name}</h3>
+                    <h3>${r.game.name}</h3>
                     <span class="review-score">⭐ ${r.score}/10</span>
                 </div>
                 <p>${r.comment}</p>
@@ -101,8 +97,8 @@ async function loadReviews(userId: number, canEdit: boolean) {
                 }
             </div>
         `;
-    container.appendChild(card);
-  });
+        container.appendChild(card);
+    }
 
   if (canEdit) addReviewActions();
 }

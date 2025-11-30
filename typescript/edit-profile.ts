@@ -1,4 +1,5 @@
 import { backendAddress } from "./constantes.js";
+import { api } from "./api.js";
 
 function getUserIdFromURL(): number | null {
   const params = new URLSearchParams(window.location.search);
@@ -6,57 +7,55 @@ function getUserIdFromURL(): number | null {
   return param ? Number(param) : null;
 }
 
-function getLoggedUserId(): number {
-  const token = localStorage.getItem("accessToken");
-  if (!token) return 0;
+let selectedAvatarFile: File | null = null;
 
-  try {
-    const parts = token.split(".");
-    const payloadBase64 = parts?.[1] ?? "";
-    if (!payloadBase64) return 0;
+async function loadProfile() {
+    const user = await api("/auth/me/");
 
-    const payload = JSON.parse(atob(payloadBase64));
-    return Number(payload.user_id) || 0;
-  } catch {
-    return 0;
-  }
+    const avatarEl = document.getElementById("avatar-preview") as HTMLImageElement;
+    avatarEl.src = user.avatar || "./images/default-avatar.png";
+
+    const bioInput = document.getElementById("bio-input") as HTMLTextAreaElement;
+    bioInput.value = user.bio || "";
 }
 
-async function saveProfile() {
-  const token = localStorage.getItem("accessToken");
+async function handleAvatarChange(e: Event) {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (!file) return;
 
-  const bio = (document.getElementById("bio-input") as HTMLTextAreaElement)
-    .value;
-  const avatar = (document.getElementById("avatar-input") as HTMLInputElement)
-    .files?.[0];
-
-  const formData = new FormData();
-  formData.append("bio", bio);
-  if (avatar) formData.append("avatar", avatar);
-
-  const response = await fetch(backendAddress + "api/auth/me/", {
-    method: "PATCH",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-    body: formData,
-  });
-
-  const data = await response.json();
-
-  document.getElementById("status-msg")!.textContent = "Perfil atualizado";
-  return data;
+    selectedAvatarFile = file;
+    const preview = document.getElementById("avatar-preview") as HTMLImageElement;
+    preview.src = URL.createObjectURL(file);
 }
 
-onload = () => {
-  document.getElementById("save-edit")!.addEventListener("click", saveProfile);
+async function handleSaveProfile() {
+    const msgEl = document.getElementById("status-msg") as HTMLElement;
+    msgEl.innerText = "Salvando...";
 
-  const input = document.getElementById("avatar-input") as HTMLInputElement;
-  const preview = document.getElementById("avatar-preview") as HTMLImageElement;
+    const bio = (document.getElementById("bio-input") as HTMLTextAreaElement).value;
 
-  input.addEventListener("change", () => {
-    if (input.files?.[0]) {
-      preview.src = URL.createObjectURL(input.files[0]);
+    await api("/auth/me/", {
+        method: "PATCH",
+        body: JSON.stringify({ bio }),
+    });
+
+    if (selectedAvatarFile) {
+        const formData = new FormData();
+        formData.append("avatar", selectedAvatarFile);
+
+        await api("/auth/me/", {
+            method: "PATCH",
+            body: formData,
+        });
     }
-  });
-};
+
+    msgEl.innerText = "Perfil atualizado com sucesso!";
+
+    setTimeout(loadProfile, 1000);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("avatar-input")?.addEventListener("change", handleAvatarChange);
+    document.getElementById("save-btn")?.addEventListener("click", handleSaveProfile);
+    loadProfile();
+});

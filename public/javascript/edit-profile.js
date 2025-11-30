@@ -7,6 +7,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+<<<<<<< HEAD
 import { backendAddress } from "./constantes.js";
 function getUserIdFromURL() {
     const params = new URLSearchParams(window.location.search);
@@ -65,4 +66,55 @@ onload = () => {
         }
     });
 };
+=======
+import { api } from "./api.js";
+let selectedAvatarFile = null;
+function loadProfile() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const user = yield api("/auth/me/");
+        const avatarEl = document.getElementById("avatar-preview");
+        avatarEl.src = user.avatar || "./images/default-avatar.png";
+        const bioInput = document.getElementById("bio-input");
+        bioInput.value = user.bio || "";
+    });
+}
+function handleAvatarChange(e) {
+    return __awaiter(this, void 0, void 0, function* () {
+        var _a;
+        const file = (_a = e.target.files) === null || _a === void 0 ? void 0 : _a[0];
+        if (!file)
+            return;
+        selectedAvatarFile = file;
+        const preview = document.getElementById("avatar-preview");
+        preview.src = URL.createObjectURL(file);
+    });
+}
+function handleSaveProfile() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const msgEl = document.getElementById("status-msg");
+        msgEl.innerText = "Salvando...";
+        const bio = document.getElementById("bio-input").value;
+        yield api("/auth/me/", {
+            method: "PATCH",
+            body: JSON.stringify({ bio }),
+        });
+        if (selectedAvatarFile) {
+            const formData = new FormData();
+            formData.append("avatar", selectedAvatarFile);
+            yield api("/auth/me/", {
+                method: "PATCH",
+                body: formData,
+            });
+        }
+        msgEl.innerText = "Perfil atualizado com sucesso!";
+        setTimeout(loadProfile, 1000);
+    });
+}
+document.addEventListener("DOMContentLoaded", () => {
+    var _a, _b;
+    (_a = document.getElementById("avatar-input")) === null || _a === void 0 ? void 0 : _a.addEventListener("change", handleAvatarChange);
+    (_b = document.getElementById("save-btn")) === null || _b === void 0 ? void 0 : _b.addEventListener("click", handleSaveProfile);
+    loadProfile();
+});
+>>>>>>> feature/jogos
 //# sourceMappingURL=edit-profile.js.map

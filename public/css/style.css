@@ -669,3 +669,36 @@ textarea {
     padding: 10px;
     resize: none;
 }
+.edit-review-box {
+    max-width: 400px;
+    margin: 120px auto;
+    text-align: left;
+}
+
+.edit-review-box h1 {
+    font-size: 26px;
+    margin-bottom: 20px;
+    color: var(--text-white);
+}
+
+.edit-review-box label {
+    font-size: 14px;
+    margin-top: 10px;
+    display: block;
+    color: var(--blue);
+}
+
+.edit-review-box .input-field {
+    margin-bottom: 18px;
+}
+
+#save-edit {
+    margin-top: 10px;
+}
+
+#msg {
+    text-align: center;
+    margin-top: 16px;
+    font-size: 14px;
+    color: var(--green);
+}
