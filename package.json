@@ -12,7 +12,7 @@
   "author": "",
   "license": "ISC",
   "type": "module",
-  "dependencies": {
+  "devDependencies": {
     "typescript": "^5.9.3"
   }
 }
