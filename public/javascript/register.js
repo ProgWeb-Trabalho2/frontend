@@ -8,14 +8,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { api, setAccessToken } from "./api.js";
-document.getElementById("register-form").addEventListener("submit", (e) => __awaiter(void 0, void 0, void 0, function* () {
+document
+    .getElementById("register-form")
+    .addEventListener("submit", (e) => __awaiter(void 0, void 0, void 0, function* () {
     e.preventDefault();
-    const username = document.getElementById("username").value;
+    const username = document.getElementById("username")
+        .value;
     const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-    const result = yield api("/auth/register/", {
+    const password = document.getElementById("password")
+        .value;
+    const result = yield api("auth/register/", {
         method: "POST",
-        body: JSON.stringify({ username, email, password })
+        body: JSON.stringify({ username, email, password }),
     });
     if (result.access) {
         setAccessToken(result.access);

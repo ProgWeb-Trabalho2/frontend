@@ -551,6 +551,9 @@ body.page-dark {
     padding: 0;
     min-height: 100vh;
     font-family: Arial, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .search-container {

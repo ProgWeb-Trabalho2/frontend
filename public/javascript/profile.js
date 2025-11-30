@@ -9,7 +9,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import { backendAddress } from "./constantes.js";
 import { api } from "./api.js";
-import { backendAddress } from "./constantes.js";
 import { Game } from "./Game.js";
 function getUserIdFromURL() {
     const params = new URLSearchParams(window.location.search);
@@ -65,43 +64,22 @@ function loadReviews(userId, canEdit) {
         var _a;
         const container = document.querySelector(".profile-reviews");
         container.innerHTML = "<h2>Reviews Recentes</h2>";
-<<<<<<< HEAD
-        const reviews = yield api(`/reviews/user/${userId}/`, {
-            method: "GET",
-        });
-=======
         const reviews = yield api(`/reviews/user/${userId}/`);
->>>>>>> feature/jogos
         if (!Array.isArray(reviews) || reviews.length === 0) {
             container.innerHTML += "<p>Nenhuma review encontrada.</p>";
             return;
         }
-<<<<<<< HEAD
-        reviews.forEach((r) => __awaiter(this, void 0, void 0, function* () {
-            const game = yield fetchGame(r.game_id.toString());
-            if (!game)
-                return;
-            console.log(game);
-            const card = document.createElement("div");
-            card.className = "review-card";
-            card.innerHTML = `
-            <img class="review-img" src="${game.coverUrl}" alt="Jogo">
-            <div class="review-content">
-                <div class="review-header">
-                    <h3>${game.name}</h3>
-=======
         for (const r of reviews) {
             const gameRes = yield fetch(`${backendAddress}/api/games/search-by-id/${r.game_id}/`);
             const gameData = yield gameRes.json();
-            const game = gameData[0];
+            const game = new Game(gameData[0]);
             const card = document.createElement("div");
             card.className = "review-card";
             card.innerHTML = `
-            <img class="review-img" src="${(_a = r.game.cover) !== null && _a !== void 0 ? _a : './images/game-placeholder.jpg'}" alt="${game.name}">
+            <img class="review-img" src="${(_a = game.coverUrl) !== null && _a !== void 0 ? _a : "./images/game-placeholder.jpg"}" alt="${game.name}">
             <div class="review-content">
                 <div class="review-header">
-                    <h3>${r.game.name}</h3>
->>>>>>> feature/jogos
+                    <h3>${game.name}</h3>
                     <span class="review-score">⭐ ${r.score}/10</span>
                 </div>
                 <p>${r.comment}</p>
@@ -115,11 +93,7 @@ function loadReviews(userId, canEdit) {
             </div>
         `;
             container.appendChild(card);
-<<<<<<< HEAD
-        }));
-=======
         }
->>>>>>> feature/jogos
         if (canEdit)
             addReviewActions();
     });

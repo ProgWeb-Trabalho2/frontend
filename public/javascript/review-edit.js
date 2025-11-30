@@ -10,18 +10,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import { api } from "./api.js";
 function loadReview() {
     return __awaiter(this, void 0, void 0, function* () {
-<<<<<<< HEAD
-        const index = Number(localStorage.getItem("editReviewId"));
-        const list = JSON.parse(localStorage.getItem("reviews") || "[]");
-        const review = list[index];
-        console.log(list);
-    });
-}
-onload = () => {
-    loadEditForm();
-};
-export {};
-=======
         const reviewId = localStorage.getItem("editReviewId");
         if (!reviewId)
             return window.location.href = "profile.html";
@@ -54,5 +42,4 @@ function saveReview() {
 document.getElementById("save-edit")
     .addEventListener("click", saveReview);
 loadReview();
->>>>>>> feature/jogos
 //# sourceMappingURL=review-edit.js.map

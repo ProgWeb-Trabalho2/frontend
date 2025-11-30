@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8" />
     <title>Cadastro - GamerBoxd</title>
     <link rel="stylesheet" href="./css/style.css">
 </head>
-<body>
-    <div class="container">
+
+<body class="page-dark">
+    <div id="navbar"></div>
+
+    <div class="container" style="width: 350px;">
         <h1>Criar Conta</h1>
 
         <form id="register-form">
@@ -23,5 +27,11 @@
     </div>
 
     <script type="module" src="./javascript/register.js"></script>
+    <script>
+        fetch("./components/navbar.html")
+            .then(r => r.text())
+            .then(h => document.getElementById("navbar").innerHTML = h);
+    </script>
 </body>
+
 </html>
