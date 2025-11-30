@@ -31,6 +31,8 @@ docker --version
 ### Rodar o backend
 
 Baixe a imagem do Docker Hub:  
+https://hub.docker.com/r/tulio240/progweb-frontend
+
 ```console
 docker pull tulio240/progweb-backend:latest
 ```
@@ -47,6 +49,7 @@ http://localhost:8000
 ### Rodar o frontend
 
 Baixe a imagem:    
+https://hub.docker.com/r/tulio240/progweb-frontend
 
 ```console
 docker pull tulio240/progweb-frontend:latest
@@ -134,4 +137,5 @@ Implementamos todas as funcionalidades prometidas.
 
 ## Link backend
 
+https://hub.docker.com/r/<usuario>/progweb-backend
 https://github.com/ProgWeb-Trabalho2/backend
