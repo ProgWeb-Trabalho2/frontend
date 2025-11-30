@@ -7,14 +7,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { api } from "./api.js";
+import { backendAddress } from "./constantes.js";
+function getUserIdFromURL() {
+    const params = new URLSearchParams(window.location.search);
+    const param = params.get("user");
+    return param ? Number(param) : null;
+}
 function getLoggedUserId() {
     var _a;
     const token = localStorage.getItem("accessToken");
     if (!token)
         return 0;
     try {
-        const parts = token.split('.');
+        const parts = token.split(".");
         const payloadBase64 = (_a = parts === null || parts === void 0 ? void 0 : parts[1]) !== null && _a !== void 0 ? _a : "";
         if (!payloadBase64)
             return 0;
@@ -25,39 +30,39 @@ function getLoggedUserId() {
         return 0;
     }
 }
-function loadReview() {
+function saveProfile() {
     return __awaiter(this, void 0, void 0, function* () {
         var _a;
-        const reviewId = localStorage.getItem("editReviewId");
-        if (!reviewId)
-            return window.location.href = "profile.html";
-        const review = yield api(`/reviews/${reviewId}/`);
-        const gamesRes = yield fetch("./data/games.json");
-        const games = yield gamesRes.json();
-        const gameName = ((_a = games.find((g) => g.id === review.game_id)) === null || _a === void 0 ? void 0 : _a.name) || "Jogo desconhecido";
-        document.getElementById("game-name").innerText = gameName;
-        document.getElementById("score").value = review.score.toString();
-        document.getElementById("comment").value = review.comment;
-    });
-}
-function saveReview() {
-    return __awaiter(this, void 0, void 0, function* () {
-        const reviewId = localStorage.getItem("editReviewId");
-        const loggedId = getLoggedUserId();
-        if (!reviewId || !loggedId)
-            return;
-        const score = Number(document.getElementById("score").value);
-        const comment = document.getElementById("comment").value;
-        yield api(`/reviews/${reviewId}/`, {
+        const token = localStorage.getItem("accessToken");
+        const bio = document.getElementById("bio-input")
+            .value;
+        const avatar = (_a = document.getElementById("avatar-input")
+            .files) === null || _a === void 0 ? void 0 : _a[0];
+        const formData = new FormData();
+        formData.append("bio", bio);
+        if (avatar)
+            formData.append("avatar", avatar);
+        const response = yield fetch(backendAddress + "api/auth/me/", {
             method: "PATCH",
-            body: JSON.stringify({ score, comment })
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+            body: formData,
         });
-        document.getElementById("msg").innerText = "Alterações salvas com sucesso!";
-        setTimeout(() => {
-            window.location.href = "profile.html";
-        }, 1000);
+        const data = yield response.json();
+        document.getElementById("status-msg").textContent = "Perfil atualizado";
+        return data;
     });
 }
-document.getElementById("save-edit").addEventListener("click", saveReview);
-loadReview();
+onload = () => {
+    document.getElementById("save-edit").addEventListener("click", saveProfile);
+    const input = document.getElementById("avatar-input");
+    const preview = document.getElementById("avatar-preview");
+    input.addEventListener("change", () => {
+        var _a;
+        if ((_a = input.files) === null || _a === void 0 ? void 0 : _a[0]) {
+            preview.src = URL.createObjectURL(input.files[0]);
+        }
+    });
+};
 //# sourceMappingURL=edit-profile.js.map
