@@ -17,7 +17,7 @@ document
     const email = document.getElementById("email").value;
     const password = document.getElementById("password")
         .value;
-    const result = yield api("auth/register/", {
+    const result = yield api("/auth/register/", {
         method: "POST",
         body: JSON.stringify({ username, email, password }),
     });

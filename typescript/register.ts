@@ -11,7 +11,7 @@ document
     const password = (document.getElementById("password") as HTMLInputElement)
       .value;
 
-    const result = await api("auth/register/", {
+    const result = await api("/auth/register/", {
       method: "POST",
       body: JSON.stringify({ username, email, password }),
     });
