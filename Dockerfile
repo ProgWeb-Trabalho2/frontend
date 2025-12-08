@@ -1,9 +1,13 @@
-FROM nginx:stable
+# Usando Nginx para servir arquivos estáticos
+FROM nginx:alpine
 
-# Copia todo o conteúdo estático para dentro do container
+# Remove arquivos padrão do nginx
+RUN rm -rf /usr/share/nginx/html/*
+
+# Copia APENAS a pasta public (que contém os arquivos compilados)
 COPY public /usr/share/nginx/html
 
-# Porta HTTP padrão
+# Expõe porta 80
 EXPOSE 80
 
 CMD ["nginx", "-g", "daemon off;"]
