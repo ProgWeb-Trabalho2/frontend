@@ -1,13 +1,16 @@
-# Usando Nginx para servir arquivos estáticos
-FROM nginx:alpine
+FROM python:3.11-alpine
 
-# Remove arquivos padrão do nginx
-RUN rm -rf /usr/share/nginx/html/*
+WORKDIR /app
 
-# Copia APENAS a pasta public (que contém os arquivos compilados)
-COPY public /usr/share/nginx/html
+# Copia TODOS os arquivos (incluindo TypeScript e configurações)
+COPY . /app/
 
-# Expõe porta 80
-EXPOSE 80
+# Instala dependências se houver requirements.txt (opcional)
+# COPY requirements.txt .
+# RUN pip install -r requirements.txt
 
-CMD ["nginx", "-g", "daemon off;"]
+# Expõe a porta 5500
+EXPOSE 5500
+
+# Comando para servir a pasta public
+CMD ["python", "-m", "http.server", "5500", "--directory", "public"]
