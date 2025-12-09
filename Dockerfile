@@ -1,16 +1,15 @@
-FROM python:3.11-alpine
+FROM nginx:alpine
 
-WORKDIR /app
+# Remove arquivos padrão
+RUN rm -rf /usr/share/nginx/html/*
 
-# Copia TODOS os arquivos (incluindo TypeScript e configurações)
-COPY . /app/
+# Cria estrutura de diretórios como no Python server
+WORKDIR /usr/share/nginx/html
 
-# Instala dependências se houver requirements.txt (opcional)
-# COPY requirements.txt .
-# RUN pip install -r requirements.txt
+# Copia TODOS os arquivos de public para a raiz do nginx
+COPY public/ .
 
-# Expõe a porta 5500
-EXPOSE 5500
+# Expõe porta 80
+EXPOSE 80
 
-# Comando para servir a pasta public
-CMD ["python", "-m", "http.server", "5500", "--directory", "public"]
+CMD ["nginx", "-g", "daemon off;"]
